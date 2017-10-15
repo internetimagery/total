@@ -8,9 +8,11 @@ addItem = (value)->
   refresh()
 
 # Remove specific entry
-removeItem = (index)->
-  items.splice(index, 1)
-  refresh()
+@removeItem = (value)->
+  i = items.indexOf value
+  if i != -1
+    items.splice i, 1
+    refresh()
 
 # Clear every entry
 clearAll = ()->
@@ -27,14 +29,26 @@ refresh = ()->
   total = 0
   for val in items by -1
     total += val
-    makeItem entries, "$#{val.toFixed 2}"
+    makeItem entries, val
   document.getElementById "calc"
-  .text "$#{total.toFixed 2}"
+  .innerHTML = "$#{total.toFixed 2}"
 
 # Make li item to display stuff
 makeItem = (parent, value)->
     elm = document.createElement "li"
-    elm.appendChild document.createTextNode value
+    p = document.createElement "span"
+    a = document.createElement "a"
+
+    p.innerHTML = "$#{value.toFixed 2}"
+    a.innerHTML = "Delete"
+    a.href = "#"
+    a.className = "u-pull-right"
+    a.onclick = (e)->
+      e.preventDefault()
+      removeItem value
+
+    elm.appendChild p
+    elm.appendChild a
     parent.appendChild elm
 
 # Take input and add item
