@@ -1,53 +1,75 @@
 # Main functionality
 
-items = load [] # Store items calculated
+# Helpers.
+KEY = "items"
+
+# Load data from localstorage
+load = (missing)->
+  try
+    console.log "Loading."
+    return JSON.parse localStorage.getItem KEY
+  catch error
+    console.log "Load failed. Falling back to default."
+    console.error error
+    return missing
+
+
+# Save data in localStorage
+save = (data)->
+  console.log "Saving."
+  console.log data
+  localStorage.setItem KEY, JSON.stringify data
 
 # Add new entry
 addItem = (value)->
-  items.push value
+  items.push {time: Date.now(), value: value}
   refresh()
 
 # Remove specific entry
-@removeItem = (value)->
-  i = items.indexOf value
-  if i != -1
-    items.splice i, 1
-    refresh()
+removeItem = (i)->
+  items.splice i, 1
+  refresh()
 
 # Clear every entry
 clearAll = ()->
-  items = []
+  console.log "Clearing items"
+  items.length = 0
   refresh()
 
 # Refresh the listings
 refresh = ()->
   # Update storage
+  console.log "ITEMS"
+  console.log items
   save items
   # Clear out previous entries
   entries = document.getElementById "entries"
   entries.innerHTML = "" # Clear all children
   total = 0
-  for val in items by -1
-    total += val
-    makeItem entries, val
+  for item, i in items by -1
+    total += item.value
+    makeItem entries, item, i
   document.getElementById "calc"
   .innerHTML = "$#{total.toFixed 2}"
 
 # Make li item to display stuff
-makeItem = (parent, value)->
+makeItem = (parent, item, index)->
     elm = document.createElement "li"
-    p = document.createElement "span"
+    amount = document.createElement "span"
+    time = document.createElement "span"
     a = document.createElement "a"
 
-    p.innerHTML = "$#{value.toFixed 2}"
+    amount.innerHTML = "$#{item.value.toFixed 2}"
+    time.innerHTML = "HI THERE"
     a.innerHTML = "Delete"
     a.href = "#"
     a.className = "u-pull-right"
+    time.className = "u-pull-left"
     a.onclick = (e)->
       e.preventDefault()
-      removeItem value
+      removeItem index
 
-    elm.appendChild p
+    elm.appendChild amount
     elm.appendChild a
     parent.appendChild elm
 
@@ -66,6 +88,8 @@ document.getElementById "clear"
 .addEventListener "click", (e)->
   e.preventDefault()
   clearAll()
+
+items = load [] # Store items calculated
 
 # Wait till page load before starting
 document.addEventListener "DOMContentLoaded", refresh
