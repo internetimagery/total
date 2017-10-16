@@ -22,6 +22,7 @@ save = (data)->
 
 # Add new entry
 addItem = (value)->
+  console.log "Adding: #{value}"
   items.push {time: Date.now(), value: value}
   refresh()
 
@@ -60,7 +61,7 @@ makeItem = (parent, item, index)->
     a = document.createElement "a"
 
     amount.innerHTML = "$#{item.value.toFixed 2}"
-    time.innerHTML = "HI THERE"
+    time.innerHTML = timeago().format item.time
     a.innerHTML = "Delete"
     a.href = "#"
     a.className = "u-pull-right"
@@ -70,6 +71,7 @@ makeItem = (parent, item, index)->
       removeItem index
 
     elm.appendChild amount
+    elm.appendChild time
     elm.appendChild a
     parent.appendChild elm
 

@@ -23,6 +23,7 @@
   };
 
   addItem = function(value) {
+    console.log("Adding: " + value);
     items.push({
       time: Date.now(),
       value: value
@@ -64,7 +65,7 @@
     time = document.createElement("span");
     a = document.createElement("a");
     amount.innerHTML = "$" + (item.value.toFixed(2));
-    time.innerHTML = "HI THERE";
+    time.innerHTML = timeago().format(item.time);
     a.innerHTML = "Delete";
     a.href = "#";
     a.className = "u-pull-right";
@@ -74,6 +75,7 @@
       return removeItem(index);
     };
     elm.appendChild(amount);
+    elm.appendChild(time);
     elm.appendChild(a);
     return parent.appendChild(elm);
   };
