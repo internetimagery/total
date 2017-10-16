@@ -7,7 +7,7 @@ KEY = "items"
 load = (missing)->
   try
     console.log "Loading."
-    return JSON.parse localStorage.getItem KEY
+    return (JSON.parse localStorage.getItem KEY) or missing
   catch error
     console.log "Load failed. Falling back to default."
     console.error error

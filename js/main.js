@@ -7,7 +7,7 @@
     var error;
     try {
       console.log("Loading.");
-      return JSON.parse(localStorage.getItem(KEY));
+      return (JSON.parse(localStorage.getItem(KEY))) || missing;
     } catch (_error) {
       error = _error;
       console.log("Load failed. Falling back to default.");
