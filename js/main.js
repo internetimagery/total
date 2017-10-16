@@ -1,55 +1,81 @@
 (function() {
-  var addItem, clearAll, items, makeItem, refresh;
+  var KEY, addItem, clearAll, items, load, makeItem, refresh, removeItem, save;
 
-  items = load([]);
+  KEY = "items";
 
-  addItem = function(value) {
-    items.push(value);
-    return refresh();
-  };
-
-  this.removeItem = function(value) {
-    var i;
-    i = items.indexOf(value);
-    if (i !== -1) {
-      items.splice(i, 1);
-      return refresh();
+  load = function(missing) {
+    var error;
+    try {
+      console.log("Loading.");
+      return JSON.parse(localStorage.getItem(KEY));
+    } catch (_error) {
+      error = _error;
+      console.log("Load failed. Falling back to default.");
+      console.error(error);
+      return missing;
     }
   };
 
+  save = function(data) {
+    console.log("Saving.");
+    console.log(data);
+    return localStorage.setItem(KEY, JSON.stringify(data));
+  };
+
+  addItem = function(value) {
+    console.log("Adding: " + value);
+    items.push({
+      time: Date.now(),
+      value: value
+    });
+    return refresh();
+  };
+
+  removeItem = function(i) {
+    items.splice(i, 1);
+    return refresh();
+  };
+
   clearAll = function() {
-    items = [];
+    console.log("Clearing items");
+    items.length = 0;
     return refresh();
   };
 
   refresh = function() {
-    var entries, total, val, _i;
+    var entries, i, item, total, _i;
+    console.log("ITEMS");
+    console.log(items);
     save(items);
     entries = document.getElementById("entries");
     entries.innerHTML = "";
     total = 0;
-    for (_i = items.length - 1; _i >= 0; _i += -1) {
-      val = items[_i];
-      total += val;
-      makeItem(entries, val);
+    for (i = _i = items.length - 1; _i >= 0; i = _i += -1) {
+      item = items[i];
+      total += item.value;
+      makeItem(entries, item, i);
     }
     return document.getElementById("calc").innerHTML = "$" + (total.toFixed(2));
   };
 
-  makeItem = function(parent, value) {
-    var a, elm, p;
+  makeItem = function(parent, item, index) {
+    var a, amount, elm, time;
     elm = document.createElement("li");
-    p = document.createElement("span");
+    amount = document.createElement("span");
+    time = document.createElement("span");
     a = document.createElement("a");
-    p.innerHTML = "$" + (value.toFixed(2));
+    amount.innerHTML = "$" + (item.value.toFixed(2));
+    time.innerHTML = timeago().format(item.time);
     a.innerHTML = "Delete";
     a.href = "#";
     a.className = "u-pull-right";
+    time.className = "u-pull-left";
     a.onclick = function(e) {
       e.preventDefault();
-      return removeItem(value);
+      return removeItem(index);
     };
-    elm.appendChild(p);
+    elm.appendChild(amount);
+    elm.appendChild(time);
     elm.appendChild(a);
     return parent.appendChild(elm);
   };
@@ -69,6 +95,8 @@
     e.preventDefault();
     return clearAll();
   });
+
+  items = load([]);
 
   document.addEventListener("DOMContentLoaded", refresh);
 
